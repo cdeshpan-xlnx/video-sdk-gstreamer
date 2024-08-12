@@ -154,11 +154,10 @@ fi
 # GStreamer core package installation
 cp ./patches/0001-build-Adapt-to-backwards-incompatible-change-in-GNU-.patch /tmp
 
-cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.16.2.tar.xz --no-check-certificate && \
-    tar -xvf gstreamer-1.16.2.tar.xz && cd gstreamer-1.16.2 && \
-    cd common && patch -p1 < /tmp/0001-build-Adapt-to-backwards-incompatible-change-in-GNU-.patch && cd .. && \
-    ./autogen.sh --prefix=/opt/xilinx/vvas --disable-gtk-doc
-    make -j$cpu_count && sudo make install
+cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.22.0.tar.xz --no-check-certificate && \
+    tar -xvf gstreamer-1.22.0.tar.xz && cd gstreamer-1.22.0 && \
+    meson build --prefix=/opt/xilinx/vvas --libdir=/opt/xilinx/vvas/lib && \
+    ninja -C build && sudo ninja -C build install && \
 retval=$?
 if [ $retval -ne 0 ]; then
 	echo "Unable to install gstreamer core package ($retval)"
@@ -167,25 +166,24 @@ if [ $retval -ne 0 ]; then
 fi
 
 cd $BASEDIR
-rm -rf /tmp/gstreamer-1.16.2*
+rm -rf /tmp/gstreamer-1.22.0*
 
 # GStreamer base package installation with patch
 cp ./patches/0001-Add-Xilinx-s-format-support.patch /tmp
 cp ./patches/0001-gst-plugins-base-Add-HDR10-support.patch /tmp
 
-cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.16.2.tar.xz --no-check-certificate && \
-    tar -xvf gst-plugins-base-1.16.2.tar.xz && cd gst-plugins-base-1.16.2 && \
-    cd common && patch -p1 < /tmp/0001-build-Adapt-to-backwards-incompatible-change-in-GNU-.patch && cd .. && \
-    patch -p1 < /tmp/0001-Add-Xilinx-s-format-support.patch && \
-    patch -p1 < /tmp/0001-gst-plugins-base-Add-HDR10-support.patch
+cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.22.0.tar.xz --no-check-certificate && \
+    tar -xvf gst-plugins-base-1.22.0.tar.xz && cd gst-plugins-base-1.22.0 && \
+    #patch -p1 < /tmp/0001-Add-Xilinx-s-format-support.patch && \
+    #patch -p1 < /tmp/0001-gst-plugins-base-Add-HDR10-support.patch
 retval=$?
 if [ $retval -ne 0 ]; then
 	echo "Unable to apply patch"
 	cd $BASEDIR
 	return 1
 fi
-    ./autogen.sh --prefix=/opt/xilinx/vvas --disable-gtk-doc && \
-    make -j$cpu_count && sudo make install && \
+    meson build --prefix=/opt/xilinx/vvas --libdir=/opt/xilinx/vvas/lib -Dexamples=disabled && \
+    ninja -C build && sudo ninja -C build install && \
 retval=$?
 if [ $retval -ne 0 ]; then
 	echo "Unable to install base gstreamer plugins ($retval)"
@@ -193,17 +191,16 @@ if [ $retval -ne 0 ]; then
 	return 1
 fi
 cd $BASEDIR
-rm -rf /tmp/gst-plugins-base-1.16.2*
+rm -rf /tmp/gst-plugins-base-1.22.0*
 
 # GStreamer good package installation
 cp ./patches/0001-Use-helper-function-to-map-colorimetry-parameters.patch /tmp
 
-cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.16.2.tar.xz --no-check-certificate && \
-    tar -xvf gst-plugins-good-1.16.2.tar.xz && cd gst-plugins-good-1.16.2 && \
-    cd common && patch -p1 < /tmp/0001-build-Adapt-to-backwards-incompatible-change-in-GNU-.patch && cd .. && \
-    patch -p1 < /tmp/0001-Use-helper-function-to-map-colorimetry-parameters.patch && \
-    ./autogen.sh --prefix=/opt/xilinx/vvas --disable-gtk-doc && \
-    make -j$cpu_count && sudo make install
+cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.22.0.tar.xz --no-check-certificate && \
+    tar -xvf gst-plugins-good-1.22.0.tar.xz && cd gst-plugins-good-1.22.0 && \
+    #patch -p1 < /tmp/0001-Use-helper-function-to-map-colorimetry-parameters.patch && \
+    meson build --prefix=/opt/xilinx/vvas --libdir=/opt/xilinx/vvas/lib && \
+    ninja -C build && sudo ninja -C build install && \
 retval=$?
 if [ $retval -ne 0 ]; then
 	echo "Unable to install good gstreamer plugins ($retval)"
@@ -211,17 +208,17 @@ if [ $retval -ne 0 ]; then
 	return 1
 fi
 cd $BASEDIR
-rm -rf /tmp/gst-plugins-good-1.16.2*
+rm -rf /tmp/gst-plugins-good-1.22.0*
 
 # GStreamer bad package installation
 cp ./patches/0001-Update-Colorimetry-and-SEI-parsing-for-HDR10.patch /tmp
 cp ./patches/0001-Derive-src-fps-from-vui_time_scale-vui_num_units_in_.patch /tmp
-cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.16.2.tar.xz --no-check-certificate && \
-    tar -xvf gst-plugins-bad-1.16.2.tar.xz && cd gst-plugins-bad-1.16.2 && \
-    cd common && patch -p1 < /tmp/0001-build-Adapt-to-backwards-incompatible-change-in-GNU-.patch && cd .. && \
-    patch -p1 < /tmp/0001-Update-Colorimetry-and-SEI-parsing-for-HDR10.patch && \
-    patch -p1 < /tmp/0001-Derive-src-fps-from-vui_time_scale-vui_num_units_in_.patch && \
-    ./autogen.sh --prefix=/opt/xilinx/vvas --disable-gtk-doc --disable-openexr --disable-yadif --disable-mpegpsmux && make -j$cpu_count && sudo make install
+cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.22.0.tar.xz --no-check-certificate && \
+    tar -xvf gst-plugins-bad-1.22.0.tar.xz && cd gst-plugins-bad-1.22.0 && \
+    #patch -p1 < /tmp/0001-Update-Colorimetry-and-SEI-parsing-for-HDR10.patch && \
+    #patch -p1 < /tmp/0001-Derive-src-fps-from-vui_time_scale-vui_num_units_in_.patch && \
+	meson build --prefix=/opt/xilinx/vvas --libdir=/opt/xilinx/vvas/lib && \
+    ninja -C build && sudo ninja -C build install && \
 retval=$?
 if [ $retval -ne 0 ]; then
 	echo "Unable to install bad gstreamer plugins ($retval)"
@@ -229,12 +226,12 @@ if [ $retval -ne 0 ]; then
 	return 1
 fi
 cd $BASEDIR
-rm -rf /tmp/gst-plugins-bad-1.16.2*
+rm -rf /tmp/gst-plugins-bad-1.22.0*
 
 # GStreamer libav package installation
-cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-libav/gst-libav-1.16.2.tar.xz --no-check-certificate && \
-    tar -xvf gst-libav-1.16.2.tar.xz && cd gst-libav-1.16.2 && \
-    ./autogen.sh --prefix=/opt/xilinx/vvas --disable-gtk-doc  && make -j$cpu_count && sudo make install
+cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-libav/gst-libav-1.22.0.tar.xz --no-check-certificate && \
+    tar -xvf gst-libav-1.22.0.tar.xz && cd gst-libav-1.22.0 && \
+    meson build --prefix=/opt/xilinx/vvas --libdir=/opt/xilinx/vvas/lib && ninja -C build && sudo ninja -C build install && \
 retval=$?
 if [ $retval -ne 0 ]; then
 	echo "Unable to install gstreamer libav ($retval)"
@@ -242,7 +239,7 @@ if [ $retval -ne 0 ]; then
 	return 1
 fi
 cd $BASEDIR
-rm -rf /tmp/gst-libav-1.16.2*
+rm -rf /tmp/gst-libav-1.22.0*
 
 ######## Install Meson ###########
 if [[ $OS_TYPE == "UBUNTU" ]]; then
@@ -281,4 +278,4 @@ rm -rf ~/.cache/gstreamer-1.0/
 
 echo "#######################################################################"
 echo "########         GStreamer setup completed successful          ########"
-echo"#######################################################################"
+echo "#######################################################################"
